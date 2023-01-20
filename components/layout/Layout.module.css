@@ -1,0 +1,24 @@
+.container {
+  padding: 1rem;
+}
+
+.container h1 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.container h2 {
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.container p {
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+
+  color: #9ba0a5;
+  margin-top: 0.5rem;
+}

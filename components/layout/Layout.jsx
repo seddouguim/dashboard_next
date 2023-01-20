@@ -1,6 +1,8 @@
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 
+import style from "./Layout.module.css";
+
 const Layout = ({ children }) => {
   return (
     <>
@@ -10,7 +12,7 @@ const Layout = ({ children }) => {
           <Sidebar />
         </div>
 
-        <main>{children}</main>
+        <main className={style.container}>{children}</main>
 
         {/* Right Sidebar */}
         <div className="right"></div>

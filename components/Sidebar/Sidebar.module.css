@@ -5,7 +5,6 @@
   box-shadow: 0 0 0rem rgba(45, 45, 49, 0.1);
 
   padding-top: 0.5rem;
-  padding-left: 0.5rem;
 }
 
 .sidebar h2 {
@@ -17,13 +16,22 @@
 .sidebar ul {
   list-style: none;
   padding: 0;
-  margin-left: 0.25rem;
+}
+
+.padding_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar a {
   display: block;
+
+  width: 90%;
+
   margin: 0.5rem 0;
   padding: 0.5rem;
+
   display: flex;
   align-items: center;
 
@@ -32,14 +40,18 @@
 
   font-size: 14px;
   font-weight: bold;
-  gap: 1.5rem;
-  transition: all 0.2s ease-in-out;
 
-  color: #e8eaed;
+  gap: 1.5rem;
+  transition: all 0.5s ease-in-out;
 }
 
-.sidebar a:hover {
-  background-color: #3d4043;
+a.active {
+  background-color: #303234;
+  color: rgb(239, 239, 239);
+}
+
+.sidebar a:hover:not(.active) {
+  background-color: #323537;
 }
 
 .sidebar .icon {
