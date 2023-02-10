@@ -10,7 +10,7 @@ const Navbar = () => {
   return (
     <nav className={styles.nav}>
       <Logo />
-      <User />
+      {/* <User /> */}
     </nav>
   );
 };
