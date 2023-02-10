@@ -1,31 +1,12 @@
 .nav {
   height: 3.5rem;
+  width: 100%;
   background-color: #292a2d;
-  box-shadow: 0 0 0.5rem 0.5rem rgba(45, 45, 49, 0.147);
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
   display: flex;
   align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 1rem;
-  gap: 0.5rem;
-}
-
-.logo .img {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.title {
-}
-
-.title h1 {
-  font-size: 1.2rem;
-  font-weight: 400;
+  justify-content: space-between;
+  padding: 0 1rem;
 }
