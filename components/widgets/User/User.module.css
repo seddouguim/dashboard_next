@@ -6,19 +6,27 @@
   position: relative;
   padding: 0 0.5rem;
 
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex: 1;
+}
+
+.content {
+  display: flex;
+  width: fit-content;
+  height: 100%;
+
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.25rem;
   cursor: pointer;
 }
 
-.container:hover {
+.content:hover {
   background-color: #3d3f43;
-}
-
-.container .content {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-
-  height: 100%;
 }
 
 .avatar {
