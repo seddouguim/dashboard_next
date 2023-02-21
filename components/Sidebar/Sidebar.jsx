@@ -15,7 +15,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 const menuItems = [
   {
     title: "Dashboard",
-    path: "/dashboard",
+    path: "/",
     icon: <DashboardIcon />,
   },
   {

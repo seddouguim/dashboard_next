@@ -6,6 +6,20 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 export default function BasicCard({ title, value, unit, icon }) {
+  let color = "text.primary";
+
+  if (value === "ON") {
+    color = "success.main";
+  }
+
+  if (value === "OFF") {
+    color = "error.main";
+  }
+
+  if (title === "Energy") {
+    color = "info.main";
+  }
+
   return (
     <Card sx={{ minWidth: 275, paddingBottom: "1rem" }}>
       <CardContent>
@@ -13,8 +27,13 @@ export default function BasicCard({ title, value, unit, icon }) {
           {title}
         </Typography>
 
-        <Typography variant="h2" sx={{ textAlign: "center" }} component="div">
-          ON
+        <Typography
+          variant="h2"
+          sx={{ textAlign: "center" }}
+          component="div"
+          color={color}
+        >
+          {value}
         </Typography>
       </CardContent>
     </Card>

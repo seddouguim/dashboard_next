@@ -1,111 +1,131 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+
+import { useDispatch, useSelector } from "react-redux";
 
 import LoginLayout from "../../components/layout/LoginLayout";
 
 import { Typography } from "@mui/material";
 
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+
 import styles from "./login.module.css";
+import styled from "@emotion/styled";
+
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
+
+const Container = styled(Paper)(({ theme }) => ({
+  width: "25%",
+  height: "fit-content",
+  padding: "1rem",
+}));
+
+import { login } from "../../store/auth/thunks";
+import { fetchUser } from "../../store/user/thunks";
 
 const Login = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const usernameRef = useRef();
+  const { access_token, error } = useSelector((state) => state.auth);
+
+  const { isLoading, username } = useSelector((state) => state.user);
+
+  const emailRef = useRef();
   const passwordRef = useRef();
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const username = usernameRef.current.value;
+    const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
-    setLoading(true);
-    setError(null);
-
     try {
-      // const user = await Auth.signIn(username, password);
-      // const { idToken, accessToken, refreshToken } = user.signInUserSession;
-      // console.log("idToken", idToken);
-      // console.log("accessToken", accessToken);
-      // console.log("refreshToken", refreshToken);
+      const first_step = dispatch(login({ email, password }));
+      const second_step = await Promise.all([first_step]);
     } catch (error) {
-      setError(error.message);
-      console.log("error", error);
-    } finally {
-      setLoading(false);
+      console.log(error);
     }
   };
 
+  useEffect(() => {
+    if (!access_token) return;
+
+    dispatch(fetchUser());
+
+    // check if user data is fetched
+    if (username) {
+      router.push("/");
+    }
+  }, [access_token, username]);
+
   return (
     <div className={styles["container"]}>
-      <div className={styles["login-container"]}>
-        <div className={styles["header"]}>
+      <Container sx={{ boxShadow: 3 }}>
+        <Stack spacing={3}>
+          <Stack alignItems="center">
+            <Typography
+              variant="h6"
+              component="h1"
+              color="#9a9c9e"
+              fontWeight="medium"
+              fontSize={14}
+            >
+              WELCOME BACK
+            </Typography>
+
+            <Typography variant="h3" fontWeight="medium" fontSize={20}>
+              Login to your account
+            </Typography>
+          </Stack>
+
+          <form>
+            <TextField
+              variant="outlined"
+              id="email"
+              label="Email"
+              fullWidth
+              inputRef={emailRef}
+              margin="normal"
+            />
+            <TextField
+              variant="outlined"
+              id="password"
+              label="Password"
+              fullWidth
+              inputRef={passwordRef}
+              margin="normal"
+              type="password"
+            />
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                disabled={isLoading}
+                size="large"
+                fullWidth
+                sx={{ marginTop: "1rem" }}
+              >
+                {isLoading ? <CircularProgress size={20} /> : "Login"}
+              </Button>
+            </div>
+          </form>
+
           <Typography
             variant="h6"
             component="h1"
-            color="#9a9c9e"
+            color="error"
             fontWeight="medium"
             fontSize={14}
           >
-            WELCOME BACK
+            {error && "Invalid credentials."}
           </Typography>
-
-          <Typography variant="h3" fontWeight="medium" fontSize={20}>
-            Login to your account
-          </Typography>
-        </div>
-        <div className={styles["input-container"]}>
-          <div className={styles["input"]}>
-            <label htmlFor="username">
-              <Typography
-                variant="h6"
-                component="h1"
-                fontWeight="medium"
-                fontSize={14}
-                gutterBottom
-              >
-                E-Mail or Username
-              </Typography>
-            </label>
-            <input
-              type="text"
-              id="username"
-              placeholder="Enter your username"
-              ref={usernameRef}
-            />
-          </div>
-
-          <div className={styles["input"]}>
-            <label htmlFor="password">
-              <Typography
-                variant="h6"
-                component="h1"
-                fontWeight="medium"
-                fontSize={14}
-                gutterBottom
-              >
-                Password
-              </Typography>
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              ref={passwordRef}
-            />
-          </div>
-
-          <div className={styles["input"]}>
-            <button className="button-9" onClick={handleSubmit}>
-              Login now
-            </button>
-          </div>
-        </div>
-        {/* <div className={styles["footer"]}>footer</div> */}
-      </div>
+        </Stack>
+      </Container>
     </div>
   );
 };
