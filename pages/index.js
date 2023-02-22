@@ -1,14 +1,12 @@
-import { withAuth } from "../components/auth/withAuth";
 import Chart from "../components/Chart/Chart";
 import DataTable from "../components/DataTable/DataTable";
 
 import Divider from "@mui/material/Divider";
 
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 
-const Dashboard = ({ user, cookies }) => {
+const Dashboard = () => {
   return (
     <Box sx={{ maxHeight: "100%", overflow: "auto" }}>
       <Typography
@@ -27,5 +25,4 @@ const Dashboard = ({ user, cookies }) => {
   );
 };
 
-// export default withAuth(Dashboard);
 export default Dashboard;
