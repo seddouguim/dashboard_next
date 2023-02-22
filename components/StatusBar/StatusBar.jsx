@@ -27,6 +27,7 @@ const StatusBar = () => {
   const energy_value = data.resistance_kwh + data.pump_kwh;
 
   if (!data.current_temperature) {
+    console.log("loading...");
     return (
       <Stack direction="column" spacing={2}>
         <Skeleton variant="rectangular">
@@ -57,7 +58,7 @@ const StatusBar = () => {
       />
       <BasicCard title="Resistance" value={resistance_value} />
       <BasicCard title="Pump" value={pump_value} />
-      <BasicCard title="Energy" value={energy_value} />
+      <BasicCard title="Energy" value={Math.round(energy_value / 10) * 10} />
     </Stack>
   );
 };
