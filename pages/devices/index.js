@@ -18,3 +18,9 @@ const Devices = () => {
 };
 
 export default Devices;
+
+export const getServerSideProps = async (ctx) => {
+  return {
+    props: {},
+  };
+};
