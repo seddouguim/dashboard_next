@@ -9,9 +9,8 @@ async function handler(req, res) {
         device_id: req.query.id,
       },
       orderBy: {
-        timestamp: "desc",
+        timestamp: "asc",
       },
-      take: 100,
     });
     res.status(200).json(data);
   } catch (error) {

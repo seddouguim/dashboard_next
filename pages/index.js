@@ -18,9 +18,9 @@ const Dashboard = () => {
       >
         Dashboard
       </Typography>
-      <DataTable />
-      <Divider sx={{ marginY: "1rem" }} />
       <Chart />
+      <Divider sx={{ marginY: "1rem" }} />
+      <DataTable />
     </Box>
   );
 };

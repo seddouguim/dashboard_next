@@ -5,7 +5,7 @@ import authenticate from "../../middleware/authenticate";
 async function handler(req, res) {
   // Set the request parameters to get the device shadow
   const params = {
-    thingName: "ESP8266",
+    thingName: "ESP01",
   };
 
   try {

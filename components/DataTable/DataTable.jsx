@@ -26,7 +26,7 @@ const DataTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const fetchData = async () => {
-    const result = await axios.get("/api/db/data?id=claay207y00083b6qint7umkc");
+    const result = await axios.get("/api/db/data?id=cuid-01");
     setRows(result.data);
   };
 
@@ -45,7 +45,7 @@ const DataTable = () => {
 
   return (
     <>
-      <Paper sx={{ marginTop: 2, maxWidth: "92%" }}>
+      <Paper sx={{ marginTop: 2 }}>
         <TableContainer>
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Typography
