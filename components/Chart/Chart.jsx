@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+
 import { Line } from "react-chartjs-2";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
@@ -6,9 +7,10 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CachedIcon from "@mui/icons-material/Cached";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { format, set } from "date-fns";
 
 import "chartjs-adapter-date-fns";
-import { format } from "date-fns";
 
 import {
   Chart as ChartJS,
@@ -19,17 +21,18 @@ import {
   LineElement,
   Tooltip as ChartTooltip,
   Legend,
+  Filler,
 } from "chart.js";
 
 ChartJS.register(
   TimeScale,
-
   PointElement,
   ChartTooltip,
   Legend,
   LinearScale,
   LineElement,
-  CategoryScale
+  CategoryScale,
+  Filler
 );
 
 const Chart = () => {
@@ -47,6 +50,15 @@ const Chart = () => {
     }
   };
 
+  const deleteData = async (id) => {
+    try {
+      const response = await fetch("/api/db/delete?id=cuid-01");
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+    setData([]);
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -59,20 +71,7 @@ const Chart = () => {
       label: "Temperature",
       data: [],
       yAxisID: "temperature",
-    };
-
-    const pumpData = {
-      label: "Pump kWh",
-      data: [],
-      yAxisID: "energy",
-      stepped: "true",
-    };
-
-    const resistanceData = {
-      label: "Resistance kWh",
-      data: [],
-      yAxisID: "energy",
-      stepped: "true",
+      fill: true,
     };
 
     const resistanceState = {
@@ -91,13 +90,17 @@ const Chart = () => {
 
     const timestamps = [];
 
-    data.forEach((item) => {
+    data?.forEach((item) => {
       temperatureData.data.push(item.current_temperature);
-      pumpData.data.push(item.pump_kwh);
       resistanceState.data.push(item.resistance_state ? "ON" : "OFF");
       pumpState.data.push(item.pump_state ? "ON" : "OFF");
-      resistanceData.data.push(item.resistance_kwh);
-      timestamps.push(item.timestamp);
+
+      const formattedTimestamp = format(
+        new Date(item.timestamp),
+        "yyyy-MM-dd HH:mm:ss"
+      );
+
+      timestamps.push(formattedTimestamp);
     });
 
     const chartData = {
@@ -119,44 +122,10 @@ const Chart = () => {
     plugins: {
       title: {
         display: true,
-        text: "Chart Title",
+        text: "Cycles Information",
       },
     },
     scales: {
-      // x: {
-      //   type: "time",
-      //   time: {
-      //     unit: "hour",
-      //     displayFormats: {
-      //       hour: "HH:mm",
-      //     },
-      //   },
-      //   grid: {
-      //     drawOnChartArea: false, // only want the grid lines for one axis to show up
-      //   },
-      //   display: true,
-      //   title: {
-      //     display: true,
-      //     text: "Date",
-      //   },
-      //   ticks: {
-      //     maxTicksLimit: 20,
-      //     source: "data",
-      //     autoSkip: true,
-      //   },
-      //   adapters: {
-      //     date: {
-      //       parser: (timestamp) => utcToZonedTime(timestamp, "YOUR_TIMEZONE"),
-      //       format: (timestamp) => {
-      //         if (timestamp.getMinutes() === 0) {
-      //           return format(timestamp, "yyyy");
-      //         } else {
-      //           return format(timestamp, "HHH:mm");
-      //         }
-      //       },
-      //     },
-      //   },
-      // },
       temperature: {
         type: "linear",
         display: true,
@@ -170,6 +139,7 @@ const Chart = () => {
         grid: {
           drawOnChartArea: true,
         },
+        min: 0,
       },
       resistance: {
         type: "category",
@@ -183,10 +153,9 @@ const Chart = () => {
         },
         stackWeight: 1,
         grid: {
-          drawOnChartArea: false, // only want the grid lines for one axis to show up
+          drawOnChartArea: false,
         },
       },
-
       pump: {
         type: "category",
         labels: ["ON", "OFF"],
@@ -199,7 +168,7 @@ const Chart = () => {
         },
         stackWeight: 1,
         grid: {
-          drawOnChartArea: false, // only want the grid lines for one axis to show up
+          drawOnChartArea: false,
         },
       },
     },
@@ -207,17 +176,15 @@ const Chart = () => {
 
   const chartData = createChartData(data);
 
-  // Define the modern color palette
   const colors = [
     "#3e82f7", // blue
     "#34c38f", // green
     "#ff6961", // red
   ];
 
-  // Assign the colors to the datasets
   chartData.datasets.forEach((dataset, index) => {
     dataset.borderColor = colors[index];
-    dataset.backgroundColor = `${colors[index]}22`; // Add some transparency to the background color
+    dataset.backgroundColor = `${colors[index]}22`;
   });
 
   return (
@@ -231,11 +198,18 @@ const Chart = () => {
         >
           Charts
         </Typography>
-        <Tooltip title="Reload">
-          <IconButton aria-label="reload" onClick={fetchData}>
-            <CachedIcon />
-          </IconButton>
-        </Tooltip>
+        <div>
+          <Tooltip title="Reload">
+            <IconButton aria-label="reload" onClick={fetchData}>
+              <CachedIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton aria-label="delete" onClick={deleteData}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
       </Toolbar>
       <div style={{ padding: "20px" }}>
         <Line data={chartData} options={chartOptions} />

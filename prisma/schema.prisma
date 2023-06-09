@@ -21,6 +21,8 @@ model DeviceData {
   resistance_on_time_total  Int
   pump_kwh                  Float
   resistance_kwh            Float
+  current_cycle             String
+  current_term              String
   timestamp                 DateTime @default(now())
 }
 
