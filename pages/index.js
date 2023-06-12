@@ -20,7 +20,7 @@ const Dashboard = () => {
       </Typography>
       <Chart />
       <Divider sx={{ marginY: "1rem" }} />
-      <DataTable />
+      {/* <DataTable /> */}
     </Box>
   );
 };

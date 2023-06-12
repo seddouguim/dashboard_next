@@ -10,6 +10,8 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { Typography } from "@mui/material";
 
+import Box from "@mui/material/Box";
+
 const StatusBar = () => {
   const [data, setData] = useState({});
   const timerRef = useRef();
@@ -54,49 +56,65 @@ const StatusBar = () => {
   }
 
   return (
-    <Stack direction="column" spacing={2} alignItems="center">
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Current Cycle
-          </Typography>
+    <Box sx={{ maxHeight: "100%", overflow: "auto" }}>
+      <Stack direction="column" spacing={2} alignItems="center">
+        <Card sx={{ minWidth: 275 }}>
+          <CardContent>
+            <Typography
+              sx={{ fontSize: 14 }}
+              color="text.secondary"
+              gutterBottom
+            >
+              Current Cycle
+            </Typography>
 
-          <Typography
-            variant="h4"
-            sx={{ textAlign: "center" }}
-            component="div"
-            color="skyblue"
-          >
-            {data.current_cycle}
-          </Typography>
-        </CardContent>
-      </Card>
+            <Typography
+              variant="h4"
+              sx={{ textAlign: "center" }}
+              component="div"
+              color={
+                data.current_cycle === "TERMINATED"
+                  ? "#43a047"
+                  : data.current_cycle === "HEATING UP"
+                  ? "red"
+                  : "lightblue"
+              }
+            >
+              {data.current_cycle}
+            </Typography>
+          </CardContent>
+        </Card>
 
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Current Term
-          </Typography>
+        <Card sx={{ minWidth: 275 }}>
+          <CardContent>
+            <Typography
+              sx={{ fontSize: 14 }}
+              color="text.secondary"
+              gutterBottom
+            >
+              Current Term
+            </Typography>
 
-          <Typography
-            variant="h4"
-            sx={{ textAlign: "center" }}
-            component="div"
-            color="pink"
-          >
-            {data.current_term ? data.current_term : "N/A"}
-          </Typography>
-        </CardContent>
-      </Card>
-      <BasicCard
-        title="Temperature"
-        value={data.current_temperature.toFixed(2)}
-        unit="C"
-      />
-      <BasicCard title="Resistance" value={resistance_value} />
-      <BasicCard title="Pump" value={pump_value} />
-      <BasicCard title="Energy" value={energy_value.toFixed(2)} />
-    </Stack>
+            <Typography
+              variant="h4"
+              sx={{ textAlign: "center" }}
+              component="div"
+              color={data.current_term === "N/A" ? "gray" : "pink"}
+            >
+              {data.current_term ? data.current_term : "N/A"}
+            </Typography>
+          </CardContent>
+        </Card>
+        <BasicCard
+          title="Temperature"
+          value={data.current_temperature.toFixed(2)}
+          unit="C"
+        />
+        <BasicCard title="Resistance" value={resistance_value} />
+        <BasicCard title="Pump" value={pump_value} />
+        <BasicCard title="Energy" value={energy_value.toFixed(2)} />
+      </Stack>
+    </Box>
   );
 };
 

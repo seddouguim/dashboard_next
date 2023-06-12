@@ -1,5 +1,8 @@
 import "../styles/globals.css";
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 
@@ -18,9 +21,11 @@ function App({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Provider store={store}>
-        {getLayout(<Component {...pageProps} />)}
-      </Provider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Provider store={store}>
+          {getLayout(<Component {...pageProps} />)}
+        </Provider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

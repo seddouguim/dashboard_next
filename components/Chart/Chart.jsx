@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 
-import { Line } from "react-chartjs-2";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
+
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CachedIcon from "@mui/icons-material/Cached";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { format, set } from "date-fns";
 
+import { Box, Stack } from "@mui/material";
+
+import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
+
+import { format } from "date-fns";
+
+import axios from "axios";
 
 import {
   Chart as ChartJS,
@@ -22,9 +28,11 @@ import {
   Tooltip as ChartTooltip,
   Legend,
   Filler,
+  Title,
 } from "chart.js";
 
 ChartJS.register(
+  Title,
   TimeScale,
   PointElement,
   ChartTooltip,
@@ -35,24 +43,52 @@ ChartJS.register(
   Filler
 );
 
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+
 const Chart = () => {
   const [data, setData] = useState([]);
+  const [timeframe, setTimeframe] = useState({
+    startDate: dayjs(),
+    endDate: dayjs(),
+  });
 
   const fetchData = async () => {
-    try {
-      const response = await fetch("/api/db/data?id=cuid-01");
-      // const response = await fetch("/api/db/data?id=claay207y00083b6qint7umkc");
+    if (!timeframe.startDate || !timeframe.endDate) {
+      return;
+    }
 
-      const jsonData = await response.json();
-      setData(jsonData);
+    const startDateString = timeframe.startDate
+      .startOf("day")
+      .format("YYYY-MM-DD HH:mm:ss");
+    const endDateString = timeframe.endDate
+      .endOf("day")
+      .format("YYYY-MM-DD HH:mm:ss");
+
+    console.log(
+      "Fetching data with these dates: ",
+      startDateString,
+      endDateString
+    );
+
+    try {
+      const response = await axios.get("/api/db/data", {
+        params: {
+          id: "cuid-01",
+          startDate: startDateString,
+          endDate: endDateString,
+        },
+      });
+
+      setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const deleteData = async (id) => {
+  const deleteData = async () => {
     try {
-      const response = await fetch("/api/db/delete?id=cuid-01");
+      await fetch("/api/db/delete?id=cuid-01");
     } catch (error) {
       console.error("Error deleting data:", error);
     }
@@ -61,10 +97,7 @@ const Chart = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  const skipped = (ctx, value) =>
-    ctx.p0.skip || ctx.p1.skip ? value : undefined;
+  }, [timeframe]);
 
   const createChartData = (data) => {
     const temperatureData = {
@@ -88,28 +121,40 @@ const Chart = () => {
       stepped: true,
     };
 
-    const timestamps = [];
-
     data?.forEach((item) => {
-      temperatureData.data.push(item.current_temperature);
-      resistanceState.data.push(item.resistance_state ? "ON" : "OFF");
-      pumpState.data.push(item.pump_state ? "ON" : "OFF");
-
       const formattedTimestamp = format(
         new Date(item.timestamp),
-        "yyyy-MM-dd HH:mm:ss"
+        "dd/MM/yy 'at' HH:mm:ss"
       );
 
-      timestamps.push(formattedTimestamp);
+      temperatureData.data.push({
+        x: formattedTimestamp,
+        y: item.current_temperature,
+        current_cycle: item.current_cycle,
+        current_term: item.current_term,
+      });
+
+      resistanceState.data.push({
+        x: formattedTimestamp,
+        y: item.resistance_state ? "ON" : "OFF",
+        current_cycle: item.current_cycle,
+        current_term: item.current_term,
+      });
+
+      pumpState.data.push({
+        x: formattedTimestamp,
+        y: item.pump_state ? "ON" : "OFF",
+      });
     });
 
     const chartData = {
-      labels: timestamps,
       datasets: [temperatureData, pumpState, resistanceState],
     };
 
     return chartData;
   };
+
+  const chartData = createChartData(data);
 
   const chartOptions = {
     responsive: true,
@@ -123,9 +168,34 @@ const Chart = () => {
       title: {
         display: true,
         text: "Cycles Information",
+        font: {
+          size: 18,
+          weight: "bold",
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            if (context.dataset.yAxisID === "temperature") {
+              const dataPoint = context.dataset.data[context.dataIndex];
+              const term = dataPoint.current_term || "N/A";
+              return [
+                `${context.dataset.label}: ${context.parsed.y}`,
+                `Cycle: ${dataPoint.current_cycle}`,
+                `Term: ${term}`,
+              ];
+            }
+          },
+        },
       },
     },
     scales: {
+      x: {
+        ticks: {
+          maxRotation: 90,
+          minRotation: 90,
+        },
+      },
       temperature: {
         type: "linear",
         display: true,
@@ -134,8 +204,11 @@ const Chart = () => {
         title: {
           display: true,
           text: "Temperature (°C)",
+          font: {
+            weight: "bold",
+          },
         },
-        stackWeight: 2,
+        stackWeight: 4,
         grid: {
           drawOnChartArea: true,
         },
@@ -150,8 +223,11 @@ const Chart = () => {
         title: {
           display: true,
           text: "Resistance",
+          font: {
+            weight: "bold",
+          },
         },
-        stackWeight: 1,
+        stackWeight: 2,
         grid: {
           drawOnChartArea: false,
         },
@@ -165,8 +241,11 @@ const Chart = () => {
         title: {
           display: true,
           text: "Pump",
+          font: {
+            weight: "bold",
+          },
         },
-        stackWeight: 1,
+        stackWeight: 2,
         grid: {
           drawOnChartArea: false,
         },
@@ -174,13 +253,7 @@ const Chart = () => {
     },
   };
 
-  const chartData = createChartData(data);
-
-  const colors = [
-    "#3e82f7", // blue
-    "#34c38f", // green
-    "#ff6961", // red
-  ];
+  const colors = ["#3e82f7", "#34c38f", "#ff6961"];
 
   chartData.datasets.forEach((dataset, index) => {
     dataset.borderColor = colors[index];
@@ -193,8 +266,8 @@ const Chart = () => {
         <Typography
           variant="h1"
           fontSize="0.8rem"
-          textTransform="uppercase"
           fontWeight="bold"
+          textTransform="uppercase"
         >
           Charts
         </Typography>
@@ -211,9 +284,34 @@ const Chart = () => {
           </Tooltip>
         </div>
       </Toolbar>
-      <div style={{ padding: "20px" }}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Stack direction="row">
+          <DatePicker
+            format="DD/MM/YYYY"
+            value={timeframe.startDate}
+            label="From"
+            onChange={(newValue) =>
+              setTimeframe({ ...timeframe, startDate: newValue })
+            }
+          />
+          <Box sx={{ display: "flex", alignItems: "center", padding: "10px" }}>
+            <Typography variant="h6" fontWeight="normal">
+              -
+            </Typography>
+          </Box>
+          <DatePicker
+            label="To"
+            format="DD/MM/YYYY"
+            value={timeframe.endDate}
+            onChange={(newValue) =>
+              setTimeframe({ ...timeframe, endDate: newValue })
+            }
+          />
+        </Stack>
+      </Box>
+      <Box sx={{ padding: "20px" }}>
         <Line data={chartData} options={chartOptions} />
-      </div>
+      </Box>
     </Paper>
   );
 };
