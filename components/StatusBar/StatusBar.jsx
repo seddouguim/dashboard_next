@@ -16,6 +16,26 @@ const StatusBar = () => {
   const [data, setData] = useState({});
   const timerRef = useRef();
 
+  function formatDuration(duration) {
+    // Convert milliseconds to seconds
+    const totalSeconds = Math.floor(duration / 1000);
+
+    // Calculate hours, minutes, and remaining seconds
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    // Format hours, minutes, and seconds with leading zeros
+    const formattedHours = hours.toString().padStart(2, "0");
+    const formattedMinutes = minutes.toString().padStart(2, "0");
+    const formattedSeconds = seconds.toString().padStart(2, "0");
+
+    // Create the formatted string
+    const formattedDuration = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+    return formattedDuration;
+  }
+
   useEffect(() => {
     timerRef.current = setInterval(async () => {
       const response = await axios.get("api/shadow");
@@ -82,6 +102,25 @@ const StatusBar = () => {
             >
               {data.current_cycle}
             </Typography>
+            <Stack direction="row" spacing={1} sx={{ marginTop: "1rem" }}>
+              <Typography
+                variant="h6"
+                fontSize={14}
+                component="div"
+                sx={{ color: "lightgray" }}
+              >
+                Time remaining:
+              </Typography>
+              <Typography
+                variant="h6"
+                fontSize={14}
+                component="div"
+                color="lightgray"
+                fontWeight="bold"
+              >
+                {formatDuration(data.current_cycle_duration)}
+              </Typography>
+            </Stack>
           </CardContent>
         </Card>
 
@@ -103,6 +142,26 @@ const StatusBar = () => {
             >
               {data.current_term ? data.current_term : "N/A"}
             </Typography>
+
+            <Stack direction="row" spacing={1} sx={{ marginTop: "1rem" }}>
+              <Typography
+                variant="h6"
+                fontSize={14}
+                component="div"
+                color="lightgray"
+              >
+                Time remaining:
+              </Typography>
+              <Typography
+                variant="h6"
+                fontSize={14}
+                component="div"
+                color="lightgray"
+                fontWeight="bold"
+              >
+                {formatDuration(data.current_term_duration)}
+              </Typography>
+            </Stack>
           </CardContent>
         </Card>
         <BasicCard
