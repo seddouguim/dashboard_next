@@ -18,7 +18,7 @@ const StatusBar = () => {
 
   function formatDuration(duration) {
     // Convert milliseconds to seconds
-    const totalSeconds = Math.floor(duration / 1000);
+    const totalSeconds = Math.ceil(duration / 1000);
 
     // Calculate hours, minutes, and remaining seconds
     const hours = Math.floor(totalSeconds / 3600);
