@@ -208,10 +208,11 @@ const Chart = () => {
             weight: "bold",
           },
         },
-        stackWeight: 4,
+        stackWeight: 2,
         grid: {
           drawOnChartArea: true,
         },
+        offset: true,
         min: 0,
       },
       resistance: {
@@ -227,10 +228,11 @@ const Chart = () => {
             weight: "bold",
           },
         },
-        stackWeight: 2,
+        stackWeight: 1,
         grid: {
           drawOnChartArea: false,
         },
+        point: { radius: 50 },
       },
       pump: {
         type: "category",
@@ -245,10 +247,11 @@ const Chart = () => {
             weight: "bold",
           },
         },
-        stackWeight: 2,
+        stackWeight: 1,
         grid: {
           drawOnChartArea: false,
         },
+        point: { radius: 50 },
       },
     },
   };
@@ -310,7 +313,7 @@ const Chart = () => {
         </Stack>
       </Box>
       <Box sx={{ padding: "20px" }}>
-        <Line data={chartData} options={chartOptions} />
+        <Line data={chartData} options={chartOptions} height={175} />
       </Box>
     </Paper>
   );
