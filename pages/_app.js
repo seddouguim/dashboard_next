@@ -1,5 +1,7 @@
 import "../styles/globals.css";
 
+import { CssBaseline } from "@mui/material";
+
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -21,6 +23,7 @@ function App({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={darkTheme}>
+      {/* <CssBaseline /> */}
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Provider store={store}>
           {getLayout(<Component {...pageProps} />)}

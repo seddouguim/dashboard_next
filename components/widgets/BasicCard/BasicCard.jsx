@@ -23,7 +23,7 @@ export default function BasicCard({ title, value, unit, icon }) {
   return (
     <Card sx={{ minWidth: 275, paddingBottom: "1rem" }}>
       <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+        <Typography sx={{ fontSize: 14 }} color="text.primary" gutterBottom>
           {title}
         </Typography>
 
