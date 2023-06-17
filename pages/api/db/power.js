@@ -1,7 +1,30 @@
 import { PrismaClient } from "@prisma/client";
+import { CloudWatchLogs, config } from "aws-sdk";
 import authenticate from "../../../middleware/authenticate";
 
 const prisma = new PrismaClient();
+
+config.update({ region: "us-east-1" });
+const cloudwatchLogs = new CloudWatchLogs();
+
+const logGroup = "Dashboard/Power_Consumption_Endpoint";
+const logStream = "Testing";
+
+function sendLogs(logGroup, logStream, logEvents) {
+  const params = {
+    logGroupName: logGroup,
+    logStreamName: logStream,
+    logEvents: logEvents,
+  };
+
+  cloudwatchLogs.putLogEvents(params, (err, data) => {
+    if (err) {
+      console.error("Failed to send logs to CloudWatch Logs:", err);
+    } else {
+      console.log("Logs sent to CloudWatch Logs:", data);
+    }
+  });
+}
 
 async function calculatePowerConsumption(startDate, endDate) {
   try {
@@ -21,6 +44,14 @@ async function calculatePowerConsumption(startDate, endDate) {
     return energy;
   } catch (error) {
     console.error(error);
+
+    const errorEvent = {
+      timestamp: new Date().getTime(),
+      message: "Failed to calculate power consumption: " + error.message,
+    };
+
+    sendLogs(logGroup, logStream, [errorEvent]);
+
     throw new Error("Failed to calculate power consumption");
   }
 }
@@ -60,11 +91,28 @@ async function handler(req, res) {
           },
         },
       });
+
+      const logEvent = {
+        timestamp: new Date().getTime(),
+        message: "Power consumption data retrieved",
+      };
+
+      sendLogs(logGroup, logStream, [logEvent]);
     } catch (error) {
-      console.error(error);
+      console.error("Error occurred:", error);
+
+      const errorEvent = {
+        timestamp: new Date().getTime(),
+        message: "Error occurred: " + error.message,
+      };
+
+      sendLogs(logGroup, logStream, [errorEvent]);
+
       res
         .status(500)
         .json({ error: "Failed to retrieve power consumption data" });
+    } finally {
+      prisma.$disconnect();
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });

@@ -40,6 +40,8 @@ async function addDummyData() {
     console.log("Dummy data added successfully.");
   } catch (error) {
     throw new Error(error);
+  } finally {
+    prisma.$disconnect();
   }
 }
 

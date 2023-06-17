@@ -15,6 +15,7 @@ import CycleInformation from "../widgets/CycleInformation";
 
 const StatusBar = () => {
   const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
   const timerRef = useRef();
 
   function formatDuration(duration) {
@@ -39,9 +40,15 @@ const StatusBar = () => {
 
   useEffect(() => {
     timerRef.current = setInterval(async () => {
-      const response = await axios.get("api/shadow");
-      console.log(response.data.state.reported);
-      setData(response.data.state.reported);
+      try {
+        const response = await axios.get("api/shadow");
+        console.log(response.data.state.reported);
+        setData(response.data.state.reported);
+      } catch (error) {
+        throw new Error(error);
+      } finally {
+        setLoading(false);
+      }
     }, 1000);
 
     return () => {
@@ -61,7 +68,7 @@ const StatusBar = () => {
     current_term_duration: data.current_term_duration,
   };
 
-  if (!data.current_temperature) {
+  if (loading) {
     return (
       <Stack direction="column" spacing={2}>
         <Skeleton variant="rectangular">
@@ -172,7 +179,7 @@ const StatusBar = () => {
         </Card>
         <BasicCard
           title="Temperature"
-          value={data.current_temperature.toFixed(2)}
+          value={data.current_temperature?.toFixed(2)}
         />
         <BasicCard title="Resistance" value={resistance_value} />
         <BasicCard title="Pump" value={pump_value} />

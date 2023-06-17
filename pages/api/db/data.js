@@ -22,6 +22,8 @@ async function handler(req, res) {
     res.status(200).json(data || []); // Set default value to an empty array if data is undefined or null
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    prisma.$disconnect();
   }
 }
 

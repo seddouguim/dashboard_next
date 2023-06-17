@@ -81,6 +81,7 @@ const Chart = () => {
       });
 
       setData(response.data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -213,7 +214,7 @@ const Chart = () => {
           drawOnChartArea: true,
         },
         offset: true,
-        min: 0,
+        min: -2,
       },
       resistance: {
         type: "category",

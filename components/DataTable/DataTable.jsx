@@ -17,6 +17,7 @@ import Typography from "@mui/material/Typography";
 import CachedIcon from "@mui/icons-material/Cached";
 
 import axios from "axios";
+import dayjs from "dayjs";
 
 import { useEffect, useState } from "react";
 
@@ -25,8 +26,31 @@ const DataTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [timeframe, setTimeframe] = useState({
+    startDate: dayjs(),
+    endDate: dayjs(),
+  });
+
   const fetchData = async () => {
-    const result = await axios.get("/api/db/data?id=cuid-01");
+    if (!timeframe.startDate || !timeframe.endDate) {
+      return;
+    }
+
+    const startDateString = timeframe.startDate
+      .startOf("day")
+      .format("YYYY-MM-DD HH:mm:ss");
+    const endDateString = timeframe.endDate
+      .endOf("day")
+      .format("YYYY-MM-DD HH:mm:ss");
+
+    const response = await axios.get("/api/db/data", {
+      params: {
+        id: "cuid-01",
+        startDate: startDateString,
+        endDate: endDateString,
+      },
+    });
+
     setRows(result.data);
   };
 
