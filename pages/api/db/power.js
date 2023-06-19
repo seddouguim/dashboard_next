@@ -41,7 +41,14 @@ async function calculatePowerConsumption(startDate, endDate) {
       },
     });
 
-    return energy;
+    // Check if energy data is null and return 0 instead
+    const pumpEnergy = energy?._sum?.pump_kwh ?? 0;
+    const resistanceEnergy = energy?._sum?.resistance_kwh ?? 0;
+
+    return {
+      pumpEnergy,
+      resistanceEnergy,
+    };
   } catch (error) {
     console.error(error);
 
