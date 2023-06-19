@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import { CloudWatchLogs, config } from "aws-sdk";
-import authenticate from "../../../middleware/authenticate";
 
-const prisma = new PrismaClient();
+import { prisma } from "../../../utils/prisma";
+import authenticate from "../../../middleware/authenticate";
 
 config.update({ region: "us-east-1" });
 const cloudwatchLogs = new CloudWatchLogs();
@@ -60,6 +59,8 @@ async function calculatePowerConsumption(startDate, endDate) {
     sendLogs(logGroup, logStream, [errorEvent]);
 
     throw new Error("Failed to calculate power consumption");
+  } finally {
+    prisma.$disconnect();
   }
 }
 
@@ -119,7 +120,7 @@ async function handler(req, res) {
         .status(500)
         .json({ error: "Failed to retrieve power consumption data" });
     } finally {
-      prisma.$disconnect();
+      console.log("Power consumption data retrieved");
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });

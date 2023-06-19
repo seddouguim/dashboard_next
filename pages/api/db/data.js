@@ -4,8 +4,6 @@ import authenticate from "../../../middleware/authenticate";
 async function handler(req, res) {
   const { startDate, endDate } = req.query;
 
-  console.log(startDate, endDate);
-
   try {
     const data = await prisma.deviceData.findMany({
       where: {
