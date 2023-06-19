@@ -41,12 +41,12 @@ async function calculatePowerConsumption(startDate, endDate) {
     });
 
     // Check if energy data is null and return 0 instead
-    const pumpEnergy = energy?._sum?.pump_kwh ?? 0;
-    const resistanceEnergy = energy?._sum?.resistance_kwh ?? 0;
+    const pump_kwh = energy?._sum?.pump_kwh ?? 0;
+    const resistance_kwh = energy?._sum?.resistance_kwh ?? 0;
 
     return {
-      pumpEnergy,
-      resistanceEnergy,
+      pump_kwh,
+      resistance_kwh,
     };
   } catch (error) {
     console.error(error);
@@ -84,8 +84,8 @@ async function handler(req, res) {
 
       const pumpPower = 20; // Pump power rating in watts
       const resistancePower = 3000; // Resistance power rating in watts
-      const pumpEnergy = (pumpPower / 1000) * (1 / 60); // Energy consumed by pump in kWh (1 minute = 1/60 hours)
-      const resistanceEnergy = (resistancePower / 1000) * (1 / 60); // Energy consumed by resistance in kWh (1 minute = 1/60 hours)
+      const pump_kwh = (pumpPower / 1000) * (1 / 60); // Energy consumed by pump in kWh (1 minute = 1/60 hours)
+      const resistance_kwh = (resistancePower / 1000) * (1 / 60); // Energy consumed by resistance in kWh (1 minute = 1/60 hours)
 
       res.status(200).json({
         data: {
@@ -94,8 +94,8 @@ async function handler(req, res) {
         },
         theoretical: {
           "1 minute": {
-            pumpEnergy,
-            resistanceEnergy,
+            pump_kwh,
+            resistance_kwh,
           },
         },
       });
