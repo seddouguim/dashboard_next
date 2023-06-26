@@ -13,11 +13,21 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import CycleInformation from "../widgets/CycleInformation";
 
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+
 const StatusBar = () => {
   const [data, setData] = useState({});
   const [energyData, setEnergyData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [timespan, setTimespan] = useState("daily");
   const timerRef = useRef();
+
+  const handleChange = (e) => {
+    setTimespan(e.target.value);
+  };
 
   function formatDuration(duration) {
     // Convert milliseconds to seconds
@@ -66,11 +76,17 @@ const StatusBar = () => {
   const resistance_value = data.resistance_state ? "ON" : "OFF";
   const pump_value = data.pump_state ? "ON" : "OFF";
 
-  console.log("Test" + JSON.stringify(energyData));
+  const daily_energy_value =
+    (
+      energyData?.data?.daily?.pump_kwh +
+      energyData?.data?.daily?.resistance_kwh
+    ).toFixed(2) || 0;
 
-  const energy_value =
-    energyData?.data?.daily?.pump_kwh +
-      energyData?.data?.daily?.resistance_kwh || 0;
+  const monthly_energy_value =
+    (
+      energyData?.data?.monthly?.pump_kwh +
+      energyData?.data?.monthly?.resistance_kwh
+    ).toFixed(2) || 0;
 
   const cycle_information = {
     current_cycle: data.current_cycle,
@@ -190,11 +206,39 @@ const StatusBar = () => {
         </Card>
         <BasicCard
           title="Temperature"
+          select
           value={data.current_temperature?.toFixed(2)}
         />
         <BasicCard title="Resistance" value={resistance_value} />
         <BasicCard title="Pump" value={pump_value} />
-        <BasicCard title="Energy" value={energy_value.toFixed(2)} />
+        <Card sx={{ minWidth: 275, paddingBottom: "1rem" }}>
+          <CardContent>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography
+                sx={{ fontSize: 14 }}
+                color="text.secondary"
+                gutterBottom
+              >
+                Energy
+              </Typography>
+              <FormControl size="small">
+                <Select id="timespan" value={timespan} onChange={handleChange}>
+                  <MenuItem value="daily">Daily</MenuItem>
+                  <MenuItem value="monthly">Monthly</MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
+
+            <Typography
+              variant="h3"
+              sx={{ textAlign: "center", marginTop: 2 }}
+              component="div"
+              color="lightblue"
+            >
+              {timespan === "daily" ? daily_energy_value : monthly_energy_value}
+            </Typography>
+          </CardContent>
+        </Card>
       </Stack>
     </Box>
   );

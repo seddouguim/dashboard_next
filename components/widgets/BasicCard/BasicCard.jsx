@@ -5,7 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-export default function BasicCard({ title, value, unit, icon }) {
+export default function BasicCard({ title, value, unit, icon, select }) {
   let color = "text.primary";
 
   if (value === "ON") {
@@ -23,7 +23,7 @@ export default function BasicCard({ title, value, unit, icon }) {
   return (
     <Card sx={{ minWidth: 275, paddingBottom: "1rem" }}>
       <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.primary" gutterBottom>
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
           {title}
         </Typography>
 
