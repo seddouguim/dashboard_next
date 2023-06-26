@@ -15,6 +15,7 @@ import CycleInformation from "../widgets/CycleInformation";
 
 const StatusBar = () => {
   const [data, setData] = useState({});
+  const [energyData, setEnergyData] = useState({});
   const [loading, setLoading] = useState(true);
   const timerRef = useRef();
 
@@ -41,9 +42,15 @@ const StatusBar = () => {
   useEffect(() => {
     timerRef.current = setInterval(async () => {
       try {
-        const response = await axios.get("api/shadow");
-        console.log(response.data.state.reported);
-        setData(response.data.state.reported);
+        let [shadowResponse, energyResponse] = await Promise.all([
+          axios.get("api/shadow"),
+          axios.get("api/db/power"),
+        ]);
+        console.log(shadowResponse.data.state.reported);
+        console.log(energyResponse.data);
+
+        setData(shadowResponse.data.state.reported);
+        setEnergyData(energyResponse.data);
       } catch (error) {
         throw new Error(error);
       } finally {
@@ -59,7 +66,11 @@ const StatusBar = () => {
   const resistance_value = data.resistance_state ? "ON" : "OFF";
   const pump_value = data.pump_state ? "ON" : "OFF";
 
-  const energy_value = data.resistance_kwh + data.pump_kwh;
+  console.log("Test" + JSON.stringify(energyData));
+
+  const energy_value =
+    energyData?.data?.daily?.pump_kwh +
+      energyData?.data?.daily?.resistance_kwh || 0;
 
   const cycle_information = {
     current_cycle: data.current_cycle,

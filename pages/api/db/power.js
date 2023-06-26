@@ -65,65 +65,61 @@ async function calculatePowerConsumption(startDate, endDate) {
 }
 
 async function handler(req, res) {
-  if (req.method === "GET") {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Set time to start of the day
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to start of the day
 
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      startOfMonth.setHours(0, 0, 0, 0); // Set time to start of the month
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0); // Set time to start of the month
 
-      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      endOfMonth.setHours(23, 59, 59, 999); // Set time to end of the month
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999); // Set time to end of the month
 
-      const dailyEnergy = await calculatePowerConsumption(today, new Date());
-      const monthlyEnergy = await calculatePowerConsumption(
-        startOfMonth,
-        endOfMonth
-      );
+    const dailyEnergy = await calculatePowerConsumption(today, new Date());
+    const monthlyEnergy = await calculatePowerConsumption(
+      startOfMonth,
+      endOfMonth
+    );
 
-      const pumpPower = 20; // Pump power rating in watts
-      const resistancePower = 3000; // Resistance power rating in watts
-      const pump_kwh = (pumpPower / 1000) * (1 / 60); // Energy consumed by pump in kWh (1 minute = 1/60 hours)
-      const resistance_kwh = (resistancePower / 1000) * (1 / 60); // Energy consumed by resistance in kWh (1 minute = 1/60 hours)
+    const pumpPower = 20; // Pump power rating in watts
+    const resistancePower = 3000; // Resistance power rating in watts
+    const pump_kwh = (pumpPower / 1000) * (1 / 60); // Energy consumed by pump in kWh (1 minute = 1/60 hours)
+    const resistance_kwh = (resistancePower / 1000) * (1 / 60); // Energy consumed by resistance in kWh (1 minute = 1/60 hours)
 
-      res.status(200).json({
-        data: {
-          daily: dailyEnergy,
-          monthly: monthlyEnergy,
+    res.status(200).json({
+      data: {
+        daily: dailyEnergy,
+        monthly: monthlyEnergy,
+      },
+      theoretical: {
+        "1 minute": {
+          pump_kwh,
+          resistance_kwh,
         },
-        theoretical: {
-          "1 minute": {
-            pump_kwh,
-            resistance_kwh,
-          },
-        },
-      });
+      },
+    });
 
-      const logEvent = {
-        timestamp: new Date().getTime(),
-        message: "Power consumption data retrieved",
-      };
+    const logEvent = {
+      timestamp: new Date().getTime(),
+      message: "Power consumption data retrieved",
+    };
 
-      sendLogs(logGroup, logStream, [logEvent]);
-    } catch (error) {
-      console.error("Error occurred:", error);
+    sendLogs(logGroup, logStream, [logEvent]);
+  } catch (error) {
+    console.error("Error occurred:", error);
 
-      const errorEvent = {
-        timestamp: new Date().getTime(),
-        message: "Error occurred: " + error.message,
-      };
+    const errorEvent = {
+      timestamp: new Date().getTime(),
+      message: "Error occurred: " + error.message,
+    };
 
-      sendLogs(logGroup, logStream, [errorEvent]);
+    sendLogs(logGroup, logStream, [errorEvent]);
 
-      res
-        .status(500)
-        .json({ error: "Failed to retrieve power consumption data" });
-    } finally {
-      console.log("Power consumption data retrieved");
-    }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve power consumption data" });
+  } finally {
+    console.log("Power consumption data retrieved");
   }
 }
 
